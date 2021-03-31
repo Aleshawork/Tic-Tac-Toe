@@ -1,5 +1,8 @@
 package Server;
 
+import Dto.Step;
+import com.google.gson.Gson;
+
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -51,23 +54,25 @@ public class Server {
 
     @Override
     public void run() {
-      String word;
+      String json;
      // todo: продумать считывание имени
 
         try {
             while (true) {
-                word=in.readLine();
+                json=in.readLine();
 
 
-                if (word.equals("stop")) {
+                if (json.equals("stop")) {
                     this.ofService();
                     break;
                 } else {
-                    System.out.println("Echoing: " + word);
+
+                    Step step = new Gson().fromJson(json,Step.class);
+                    System.out.println("Echoing: " + json);
                     // todo: добавление слова в историю
-                    for (ServerSomthing el : Server.serverSomthingLinkedList) {
-                        el.send(word);
-                    }
+//                    for (ServerSomthing el : Server.serverSomthingLinkedList) {
+//                        el.send(word);
+//                    }
                 }
             }
         } catch (IOException e) {

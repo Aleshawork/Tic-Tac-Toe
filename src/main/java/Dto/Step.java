@@ -1,9 +1,19 @@
 package Dto;
 
+import com.google.gson.annotations.SerializedName;
+
 public class Step {
+
+    @SerializedName("name")
     private String name;
+
+    @SerializedName("dtime")
     private String dtime;
+
+    @SerializedName("x")
     private int x;
+
+    @SerializedName("y")
     private int y;
 
     public Step(String name, String dtime, int x, int y) {
@@ -46,5 +56,10 @@ public class Step {
 
     public void setY(int y) {
         this.y = y;
+    }
+
+    @Override
+    public String toString() {
+        return String.format("name:%s  dtime:%s  x:%d  y:%d", name, dtime,x,y);
     }
 }

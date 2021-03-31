@@ -11,6 +11,10 @@ public class Main {
 
         Gson gson = builder.create();
         String jsonString = gson.toJson(st1);
+
+        Step step2= new Gson().fromJson(jsonString,Step.class);
+        System.out.println(step2);
+
         System.out.println(jsonString);
     }
 }

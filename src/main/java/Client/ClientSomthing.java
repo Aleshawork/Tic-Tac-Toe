@@ -1,5 +1,10 @@
 package Client;
 
+import Dto.Step;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import sun.nio.cs.StandardCharsets;
+
 import java.io.*;
 import java.net.Socket;
 import java.net.UnknownHostException;
@@ -19,8 +24,25 @@ public class ClientSomthing {
     private Date time;
     private String dtime;
     private SimpleDateFormat dt1;
+    private GsonBuilder gsonBuilder;
 
-    public ClientSomthing( String ipAdress, int port){
+    public String getIpAdress() {
+        return ipAdress;
+    }
+
+    public int getPort() {
+        return port;
+    }
+
+    public String getNickname() {
+        return nickname;
+    }
+
+    public String getDtime() {
+        return dtime;
+    }
+
+    public ClientSomthing(String ipAdress, int port){
         this.ipAdress=ipAdress;
         this.port=port;
 
@@ -32,13 +54,17 @@ public class ClientSomthing {
             e.printStackTrace();
         }
         try{
+            gsonBuilder= new GsonBuilder();
+            gsonBuilder.setPrettyPrinting();
             inputUser = new BufferedReader(new InputStreamReader(System.in));
             in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             out =new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
 
-            // todo: спросить пользователя имя
 
-            new ReadMsg().start();
+            System.out.print("Введите имя:");
+            this.nickname=inputUser.readLine();
+
+           // new ReadMsg().start();
             new WriteMsg().start();
 
         } catch (IOException e) {
@@ -59,47 +85,59 @@ public class ClientSomthing {
     }
 
 
-    private class ReadMsg  extends Thread{
-        @Override
-        public void run() {
-            String str;
-            try{
-                while(true){
-                    str=in.readLine();
-                    if(str.equals("stop")){
-                        ClientSomthing.this.ofService();
-                        break;
-                    }
-                    // todo: продумать вывод не на консоль !
-                    System.out.println(str);
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-    }
+//    private class ReadMsg  extends Thread{
+//        @Override
+//        public void run() {
+//            String json;
+//
+//            try{
+//                while(true){
+//                    json=in.readLine();
+//                    if(json.equals("stop")){
+//                        ClientSomthing.this.ofService();
+//                        break;
+//                    }
+//                    // todo: продумать вывод не на консоль !
+//                    Step step = new Gson().fromJson(json, Step.class);
+//                    System.out.println(step);
+//                }
+//            } catch (IOException e) {
+//                e.printStackTrace();
+//            }
+//        }
+//    }
 
     private class WriteMsg extends Thread {
         @Override
         public void run() {
-            String userMsg;
+            Gson gson= gsonBuilder.create();
+            int x;
+            int y;
            while(true){
                try{
                    time = new Date();
                    dt1= new SimpleDateFormat("HH:mm:ss");
                    dtime= dt1.format(time);
 
-                   userMsg= inputUser.readLine();
+                   System.out.print("Введите x:");
+                  x= Integer.parseInt(inputUser.readLine());
+                   System.out.print("Введите y:");
+                   y= Integer.parseInt(inputUser.readLine());
+                   System.out.println(nickname+" "+ dtime +" "+ x+ " "+y);
+                   Step step = new Step(nickname,dtime,x,y);
 
-                   if(userMsg.equals("stop")){
-                       out.write("stop" +"\n");
-                       ClientSomthing.this.ofService();
-                       break;
-                   }
-                   else{
-                     out.write(String.format("%s : %s --> %s \n", dtime,nickname,userMsg));
-                   }
+                   out.write(gson.toJson(step));
                    out.flush();
+
+//                   if(userMsg.equals("stop")){
+//                       out.write("stop" +"\n");
+//                       ClientSomthing.this.ofService();
+//                       break;
+//                   }
+//                   else{
+//                     out.write(String.format("%s : %s --> %s \n", dtime,nickname,userMsg));
+//                   }
+//                   out.flush();
 
                } catch (IOException e) {
                    e.printStackTrace();
