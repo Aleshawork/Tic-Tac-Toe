@@ -16,7 +16,7 @@ public class ClientSomthing {
 
     private Socket socket;
     private BufferedReader in;
-    private BufferedWriter out;
+    private PrintWriter out;
     private BufferedReader inputUser;
     private String ipAdress;
     private int port;
@@ -25,6 +25,7 @@ public class ClientSomthing {
     private String dtime;
     private SimpleDateFormat dt1;
     private GsonBuilder gsonBuilder;
+    private   int numberClient;
 
     public String getIpAdress() {
         return ipAdress;
@@ -58,11 +59,8 @@ public class ClientSomthing {
             gsonBuilder.setPrettyPrinting();
             inputUser = new BufferedReader(new InputStreamReader(System.in));
             in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-            out =new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
+            out =new PrintWriter(socket.getOutputStream(), true);
 
-
-            System.out.print("Введите имя:");
-            this.nickname=inputUser.readLine();
 
            // new ReadMsg().start();
             new WriteMsg().start();
@@ -107,14 +105,23 @@ public class ClientSomthing {
 //        }
 //    }
 
-    private class WriteMsg extends Thread {
+    public class WriteMsg extends Thread {
         @Override
         public void run() {
+
+            try{
+                System.out.println("Server set you name:"+numberClient);
+                numberClient= Integer.parseInt(in.readLine());
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
             Gson gson= gsonBuilder.create();
             int x;
             int y;
            while(true){
                try{
+
                    time = new Date();
                    dt1= new SimpleDateFormat("HH:mm:ss");
                    dtime= dt1.format(time);
@@ -124,9 +131,10 @@ public class ClientSomthing {
                    System.out.print("Введите y:");
                    y= Integer.parseInt(inputUser.readLine());
                    System.out.println(nickname+" "+ dtime +" "+ x+ " "+y);
-                   Step step = new Step(nickname,dtime,x,y);
+                   Step step = new Step(nickname,numberClient,dtime,x,y);
+                   String jsonString =gson.toJson(step)+"\n";
 
-                   out.write(gson.toJson(step));
+                   out.write(jsonString.replace("\n"," ")+"\n");
                    out.flush();
 
 //                   if(userMsg.equals("stop")){

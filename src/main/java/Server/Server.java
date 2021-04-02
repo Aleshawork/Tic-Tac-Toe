@@ -6,23 +6,44 @@ import com.google.gson.Gson;
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.ArrayList;
 import java.util.LinkedList;
 
 
 public class Server {
-    public static final int PORT=8080;
+    public static final int PORT=8081;
     public static LinkedList<ServerSomthing> serverSomthingLinkedList = new LinkedList<ServerSomthing>();
+    public static ServerSomthing server1=null;
+    public static ServerSomthing server2=null;
+    public static int number=0;
+
+    public static int getNumber(){
+        number++;
+        return number;
+    }
+
 
 
     public static void main(String[] args) throws IOException {
         ServerSocket server = new ServerSocket(PORT);
         System.out.println("Сервер запустился ...");
+        boolean flag=true;
 
         try {
             while(true){
                 Socket socket =server.accept();
                 try{
-                    serverSomthingLinkedList.add(new ServerSomthing(socket));
+                    if(Server.server1==null){
+                        server1=new ServerSomthing(socket);
+                        System.out.println("First !");
+
+                    }else if(Server.server2==null){
+                        server2= new ServerSomthing(socket);
+                        System.out.println("Second !");
+
+                    }
+
+                    //serverSomthingLinkedList.add(new ServerSomthing(socket));
                 }catch (IOException ex){
                     System.out.println("Сокет закрылся !");
                     socket.close();
@@ -38,6 +59,7 @@ public class Server {
 
 
 
+
  class ServerSomthing extends Thread{
     private Socket socket;
     private BufferedReader in;
@@ -47,6 +69,7 @@ public class Server {
         this.socket=socket;
         in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
         out =new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
+
         // todo: подумать о передаче предыдущих сообщений при заходе в чат
         start();
     }
@@ -59,7 +82,9 @@ public class Server {
 
         try {
             while (true) {
+                send(Integer.toString(Server.getNumber()));  // send number
                 json=in.readLine();
+                System.out.println(json);
 
 
                 if (json.equals("stop")) {
@@ -68,7 +93,7 @@ public class Server {
                 } else {
 
                     Step step = new Gson().fromJson(json,Step.class);
-                    System.out.println("Echoing: " + json);
+                    System.out.println("Echoing: " + step);
                     // todo: добавление слова в историю
 //                    for (ServerSomthing el : Server.serverSomthingLinkedList) {
 //                        el.send(word);

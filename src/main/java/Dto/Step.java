@@ -7,6 +7,9 @@ public class Step {
     @SerializedName("name")
     private String name;
 
+    @SerializedName("number")
+    private int number;
+
     @SerializedName("dtime")
     private String dtime;
 
@@ -16,7 +19,7 @@ public class Step {
     @SerializedName("y")
     private int y;
 
-    public Step(String name, String dtime, int x, int y) {
+    public Step(String name,int number, String dtime, int x, int y) {
         this.name = name;
         this.dtime = dtime;
         this.x = x;
@@ -24,6 +27,14 @@ public class Step {
     }
 
     public Step() {
+    }
+
+    public int getNumber() {
+        return number;
+    }
+
+    public void setNumber(int number) {
+        this.number = number;
     }
 
     public String getName() {
@@ -60,6 +71,6 @@ public class Step {
 
     @Override
     public String toString() {
-        return String.format("name:%s  dtime:%s  x:%d  y:%d", name, dtime,x,y);
+        return String.format("name:%s number:%s dtime:%s  x:%d  y:%d", name,number, dtime,x,y);
     }
 }
