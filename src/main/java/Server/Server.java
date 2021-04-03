@@ -11,38 +11,40 @@ import java.util.LinkedList;
 
 
 public class Server {
-    public static final int PORT=8081;
-    //public static LinkedList<ServerSomthing> serverSomthingLinkedList = new LinkedList<ServerSomthing>();
-    public static ServerSomthing server1=null;
-    public static ServerSomthing server2=null;
-    public static int number=0;
+    public static final int PORT = 8081;
+    public static ServerSomthing server1 = null;
+    public static ServerSomthing server2 = null;
+    public static int number = 0;
+    public static boolean end = false;
+    public static GameMap gameMap;
 
-    public static int getNumber(){
+    public static int getNumber() {
         number++;
         return number;
     }
 
 
-
     public static void main(String[] args) throws IOException {
         ServerSocket server = new ServerSocket(PORT);
         System.out.println("Сервер запустился ...");
+        gameMap= new GameMap();
 
         try {
-            while(true){
-                Socket socket =server.accept();
-                try{
-                    if(Server.server1==null){
-                        server1=new ServerSomthing(socket);
+            while (true) {
+                Socket socket = server.accept();
+                try {
+                    if (Server.server1 == null) {
+                        server1 = new ServerSomthing(socket);
                         System.out.println("Первый пользоваель подключился !");
 
-                    }else if(Server.server2==null){
-                        server2= new ServerSomthing(socket);
+                    } else if (Server.server2 == null) {
+                        server2 = new ServerSomthing(socket);
                         System.out.println("Второй пользователь подключился !");
+
 
                     }
 
-                }catch (IOException ex){
+                } catch (IOException ex) {
                     System.out.println("Сокет закрылся !");
                     socket.close();
                 }
@@ -56,51 +58,64 @@ public class Server {
 }
 
 
-
-
- class ServerSomthing extends Thread{
+class ServerSomthing extends Thread {
     private Socket socket;
     private BufferedReader in;
     private BufferedWriter out;
 
+
     public ServerSomthing(Socket socket) throws IOException {
-        this.socket=socket;
+        this.socket = socket;
         in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-        out =new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
+        out = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
 
         int number = Server.getNumber();
-        System.out.println(String.format("Сервер выдал номер: %d",number));
+        System.out.println(String.format("Сервер выдал номер: %d", number));
         send(Integer.toString(number)); // send number
-
-        // todo: подумать о передаче предыдущих сообщений при заходе в чат
         start();
+
+
     }
 
 
     @Override
     public void run() {
-      String json;
-     // todo: продумать считывание имени
-
+        String json = null;
         try {
             while (true) {
-               // send(Integer.toString(Server.getNumber()));  // send number
-                json=in.readLine();
-                System.out.println(json);
+
+                    json = in.readLine();
+                    System.out.println(json);
+
+                    if (json.equals("stop")) {
+                        this.ofService();
+                        break;
+                    } else {
+
+                        Step step = new Gson().fromJson(json, Step.class);
+                        if(step.getX()>Server.gameMap.getSize() || step.getY()>Server.gameMap.getSize()){
+                            this.send("Координаты введены неверно !");
+                        }else{
+                            Server.gameMap.setPozition(step.getX(), step.getY(), step.getNumber());
+                            if(!Server.gameMap.endOfGame()){
+                                Server.gameMap.outOnScreenGameMap();
+                            }else{
+                                Server.gameMap.outOnScreenGameMap();
+                                this.send("You win !");
+                                Server.server1.send("You lose !");
+                                Server.server2.send("You lose !");
+                                Server.server1.ofService();
+                                Server.server2.ofService();
+
+                            }
+                        }
 
 
-                if (json.equals("stop")) {
-                    this.ofService();
-                    break;
-                } else {
+                        System.out.println("Echoing: " + step);
+//
+                    }
 
-                    Step step = new Gson().fromJson(json,Step.class);
-                    System.out.println("Echoing: " + step);
-                    // todo: добавление слова в историю
-//                    for (ServerSomthing el : Server.serverSomthingLinkedList) {
-//                        el.send(word);
-//                    }
-                }
+
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -109,7 +124,7 @@ public class Server {
     }
 
     private void send(String word) {
-        try{
+        try {
             out.write(word + "\n");
             out.flush();
         } catch (IOException e) {
@@ -118,8 +133,8 @@ public class Server {
     }
 
     private void ofService() {
-        try{
-            if(!socket.isClosed()){
+        try {
+            if (!socket.isClosed()) {
                 socket.close();
                 in.close();
                 out.close();

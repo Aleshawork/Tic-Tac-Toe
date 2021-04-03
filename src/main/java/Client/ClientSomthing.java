@@ -25,6 +25,8 @@ public class ClientSomthing {
     private SimpleDateFormat dt1;
     private GsonBuilder gsonBuilder;
     private   int numberClient;
+    private WriteMsg writeMsg;
+    private ReadMsg readMsg;
 
     public String getIpAdress() {
         return ipAdress;
@@ -58,8 +60,11 @@ public class ClientSomthing {
             out =new PrintWriter(socket.getOutputStream(), true);
 
 
-           // new ReadMsg().start();
-            new WriteMsg().start();
+
+            writeMsg = new WriteMsg();
+            writeMsg.start();
+            readMsg = new ReadMsg();
+            readMsg.start();
 
         } catch (IOException e) {
             e.printStackTrace();
@@ -72,6 +77,9 @@ public class ClientSomthing {
                 socket.close();
                 in.close();
                 out.close();
+                readMsg.stop();
+                writeMsg.stop();
+
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -79,27 +87,30 @@ public class ClientSomthing {
     }
 
 
-//    private class ReadMsg  extends Thread{
-//        @Override
-//        public void run() {
-//            String json;
-//
-//            try{
-//                while(true){
-//                    json=in.readLine();
-//                    if(json.equals("stop")){
-//                        ClientSomthing.this.ofService();
-//                        break;
-//                    }
-//                    // todo: продумать вывод не на консоль !
-//                    Step step = new Gson().fromJson(json, Step.class);
-//                    System.out.println(step);
-//                }
-//            } catch (IOException e) {
-//                e.printStackTrace();
-//            }
-//        }
-//    }
+    private class ReadMsg  extends Thread{
+        @Override
+        public void run() {
+            String message;
+
+            try{
+                while(true){
+                    message=in.readLine();
+                    if(message.equals("You lose !" ) || message.equals("You win !"))
+                    {
+                        out.write("stop\n");
+                        out.flush();
+                        System.out.println(message);
+                        ClientSomthing.this.ofService();
+                        break;
+
+                    }
+                    System.out.println(message);
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
 
     public class WriteMsg extends Thread {
         @Override
