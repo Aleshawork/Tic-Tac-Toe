@@ -12,7 +12,7 @@ import java.util.LinkedList;
 
 public class Server {
     public static final int PORT=8081;
-    public static LinkedList<ServerSomthing> serverSomthingLinkedList = new LinkedList<ServerSomthing>();
+    //public static LinkedList<ServerSomthing> serverSomthingLinkedList = new LinkedList<ServerSomthing>();
     public static ServerSomthing server1=null;
     public static ServerSomthing server2=null;
     public static int number=0;
@@ -27,7 +27,6 @@ public class Server {
     public static void main(String[] args) throws IOException {
         ServerSocket server = new ServerSocket(PORT);
         System.out.println("Сервер запустился ...");
-        boolean flag=true;
 
         try {
             while(true){
@@ -35,15 +34,14 @@ public class Server {
                 try{
                     if(Server.server1==null){
                         server1=new ServerSomthing(socket);
-                        System.out.println("First !");
+                        System.out.println("Первый пользоваель подключился !");
 
                     }else if(Server.server2==null){
                         server2= new ServerSomthing(socket);
-                        System.out.println("Second !");
+                        System.out.println("Второй пользователь подключился !");
 
                     }
 
-                    //serverSomthingLinkedList.add(new ServerSomthing(socket));
                 }catch (IOException ex){
                     System.out.println("Сокет закрылся !");
                     socket.close();
@@ -70,6 +68,10 @@ public class Server {
         in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
         out =new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
 
+        int number = Server.getNumber();
+        System.out.println(String.format("Сервер выдал номер: %d",number));
+        send(Integer.toString(number)); // send number
+
         // todo: подумать о передаче предыдущих сообщений при заходе в чат
         start();
     }
@@ -82,7 +84,7 @@ public class Server {
 
         try {
             while (true) {
-                send(Integer.toString(Server.getNumber()));  // send number
+               // send(Integer.toString(Server.getNumber()));  // send number
                 json=in.readLine();
                 System.out.println(json);
 

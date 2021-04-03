@@ -20,7 +20,6 @@ public class ClientSomthing {
     private BufferedReader inputUser;
     private String ipAdress;
     private int port;
-    private String nickname;
     private Date time;
     private String dtime;
     private SimpleDateFormat dt1;
@@ -35,9 +34,6 @@ public class ClientSomthing {
         return port;
     }
 
-    public String getNickname() {
-        return nickname;
-    }
 
     public String getDtime() {
         return dtime;
@@ -110,8 +106,8 @@ public class ClientSomthing {
         public void run() {
 
             try{
-                System.out.println("Server set you name:"+numberClient);
                 numberClient= Integer.parseInt(in.readLine());
+                System.out.println("Server set you name:"+numberClient);
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -130,8 +126,8 @@ public class ClientSomthing {
                   x= Integer.parseInt(inputUser.readLine());
                    System.out.print("Введите y:");
                    y= Integer.parseInt(inputUser.readLine());
-                   System.out.println(nickname+" "+ dtime +" "+ x+ " "+y);
-                   Step step = new Step(nickname,numberClient,dtime,x,y);
+                   System.out.println(numberClient+" "+ dtime +" "+ x+ " "+y);
+                   Step step = new Step(numberClient,dtime,x,y);
                    String jsonString =gson.toJson(step)+"\n";
 
                    out.write(jsonString.replace("\n"," ")+"\n");

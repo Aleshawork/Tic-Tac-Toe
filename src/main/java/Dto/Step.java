@@ -4,8 +4,8 @@ import com.google.gson.annotations.SerializedName;
 
 public class Step {
 
-    @SerializedName("name")
-    private String name;
+//    @SerializedName("name")
+//    private String name;
 
     @SerializedName("number")
     private int number;
@@ -19,8 +19,9 @@ public class Step {
     @SerializedName("y")
     private int y;
 
-    public Step(String name,int number, String dtime, int x, int y) {
-        this.name = name;
+    public Step(int number, String dtime, int x, int y) {
+
+        this.number=number;
         this.dtime = dtime;
         this.x = x;
         this.y = y;
@@ -37,13 +38,6 @@ public class Step {
         this.number = number;
     }
 
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
 
     public String getDtime() {
         return dtime;
@@ -71,6 +65,6 @@ public class Step {
 
     @Override
     public String toString() {
-        return String.format("name:%s number:%s dtime:%s  x:%d  y:%d", name,number, dtime,x,y);
+        return String.format(" number:%d dtime:%s  x:%d  y:%d",number, dtime,x,y);
     }
 }
