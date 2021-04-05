@@ -43,14 +43,9 @@ public class GameMap {
 
             // провкеряем строки
             if(checkRow(mapOfGame.get(i))){
-
-                // todo: выявление победителя
                 return true;
             }
 
-
-            // проверям колонки
-            // todo: написать для возможности заменить size  поля
 
             StringBuffer strColumn = new StringBuffer();
             strColumn.append(mapOfGame.get(0).charAt(i));

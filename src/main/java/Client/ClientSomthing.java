@@ -1,6 +1,8 @@
 package Client;
 
+import Dto.MapDto;
 import Dto.Step;
+import Server.GameMap;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import sun.nio.cs.StandardCharsets;
@@ -27,6 +29,7 @@ public class ClientSomthing {
     private   int numberClient;
     private WriteMsg writeMsg;
     private ReadMsg readMsg;
+    private MapDto mapDto;
 
     public String getIpAdress() {
         return ipAdress;
@@ -103,8 +106,12 @@ public class ClientSomthing {
                         ClientSomthing.this.ofService();
                         break;
 
+                    }else{
+                        // todo: сделать проверку вводимых координат на клиенте (вводимая координата свободна)
+                        mapDto = new Gson().fromJson(message,MapDto.class);
+                        // Show map of game
+                        mapDto.outOnScreenGameMap();
                     }
-                    System.out.println(message);
                 }
             } catch (IOException e) {
                 e.printStackTrace();
@@ -119,6 +126,11 @@ public class ClientSomthing {
             try{
                 numberClient= Integer.parseInt(in.readLine());
                 System.out.println("Server set you name:"+numberClient);
+
+                // waiting for connection all players
+                while(true){
+                    if(in.readLine().equals("start")) break;
+                }
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -139,20 +151,11 @@ public class ClientSomthing {
                    y= Integer.parseInt(inputUser.readLine());
                    System.out.println(numberClient+" "+ dtime +" "+ x+ " "+y);
                    Step step = new Step(numberClient,dtime,x,y);
-                   String jsonString =gson.toJson(step)+"\n";
+                   String jsonString =gson.toJson(step);
 
                    out.write(jsonString.replace("\n"," ")+"\n");
                    out.flush();
 
-//                   if(userMsg.equals("stop")){
-//                       out.write("stop" +"\n");
-//                       ClientSomthing.this.ofService();
-//                       break;
-//                   }
-//                   else{
-//                     out.write(String.format("%s : %s --> %s \n", dtime,nickname,userMsg));
-//                   }
-//                   out.flush();
 
                } catch (IOException e) {
                    e.printStackTrace();

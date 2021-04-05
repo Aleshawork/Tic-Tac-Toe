@@ -1,5 +1,3 @@
-package test;
-
 
 import Server.GameMap;
 import org.junit.Assert;
